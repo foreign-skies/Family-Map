@@ -10,6 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+
+import org.json.JSONObject;
+
 import java.io.*;
 import java.net.*;
 
@@ -92,42 +95,14 @@ public class LoginFragment extends Fragment {
         return sb.toString();
     }
 
-    private static void writeString(String str, OutputStream os) throws IOException {
-        OutputStreamWriter sw = new OutputStreamWriter(os);
-        sw.write(str);
-        sw.flush();
-    }
+    private class RequestTask extends AsyncTask<URL, Integer, JSONObject> {
 
-    private class RequestTask extends AsyncTask<URL, Integer, Long> {
-
-        protected Long doInBackground(URL... urls)
+        protected JSONObject doInBackground(URL... urls)
         {
-            long output = 0;
-            try {
-                URL url = new URL("http://192.168.1.142:8080/user/login");
-                HttpURLConnection http = (HttpURLConnection) url.openConnection();
-                http.setRequestMethod("POST");
-                http.setDoOutput(true);
-                http.addRequestProperty("Accept", "application/json");
-                http.connect();
-                String reqData =
-                        "{" + "\"userName\": \"mbrann\",\"password\": \"leonandada\"" + "}";
-                OutputStream reqBody = http.getOutputStream();
-                writeString(reqData, reqBody);
-                reqBody.close();
-                if (http.getResponseCode() == HttpURLConnection.HTTP_OK)
-                {
-                    System.out.println("Route successfully claimed.");
-                }
-                else {
-                    System.out.println("ERROR: " + http.getResponseMessage());
-                }
-            }
-            catch (IOException e)
-            {
-                e.getMessage();
-            }
-
+            JSONObject output = null;
+            Client client = new Client("http://192.168.1.142:",8080);
+            String reqData = "{" + "\"userName\": \"mbrann\",\"password\": \"leonandada\"" + "}";
+            output = client.makeRequest("/user/login", reqData);
             return output;
         }
 
@@ -135,9 +110,18 @@ public class LoginFragment extends Fragment {
 
         }
 
-        protected void onPostExecute(Long result) {
-
-
+        protected void onPostExecute(JSONObject result)
+        {
+            String thing = "";
+            try
+            {
+                thing = result.get("userName").toString();
+            }
+            catch(Exception  e)
+            {
+                e.getMessage();
+            }
+            System.out.println(thing);
         }
     }
 }
