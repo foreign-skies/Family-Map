@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -22,11 +23,19 @@ import java.net.*;
  */
 public class LoginFragment extends Fragment {
 
+    private String input_url;
+    private String person_id;
+    private String auth_token;
+
     private Button sign_in;
     private EditText server_host;
+    private EditText server_port;
+    private EditText user_name;
+    private EditText password;
 
     public LoginFragment() {
         // Required empty public constructor
+        input_url = "";
     }
 
 
@@ -36,6 +45,9 @@ public class LoginFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_login, container, false);
 
         server_host = (EditText) view.findViewById(R.id.server_host_edit_text);
+        server_port = (EditText) view.findViewById(R.id.server_port_edit_text);
+        user_name = (EditText) view.findViewById(R.id.username_edit_text);
+        password = (EditText) view.findViewById(R.id.password_edit_text);
         sign_in = (Button) view.findViewById(R.id.sign_in_button);
         sign_in.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,57 +64,25 @@ public class LoginFragment extends Fragment {
         // System.out.println(server_host.getText().toString());
         try
         {
-            RequestTask task = new RequestTask();
-            task.execute(new URL("https://localhost:8080/user/login"));
+            input_url = "http://" + server_host.getText().toString() + ":" + server_port.getText().toString();
+            LoginTask task = new LoginTask();
+            task.execute(new URL(input_url));
         }
         catch (MalformedURLException e)
         {
             System.out.println(e.getMessage());
         }
 
-//        try {
-//            URL url = new URL("https://localhost:8080/user/login");
-//            HttpURLConnection http = (HttpURLConnection) url.openConnection();
-//            http.setRequestMethod("POST");
-//            http.setDoOutput(true);
-//            http.addRequestProperty("Accept", "application/json");
-//            http.connect();
-//            String reqData =
-//                    "{" + "\"userName\": \"susan\"password\": \"mysecret\"" + "}";
-//            OutputStream reqBody = http.getOutputStream();
-//            writeString(reqData, reqBody);
-//            reqBody.close();
-//            if (http.getResponseCode() == HttpURLConnection.HTTP_OK) {
-//                System.out.println("Route successfully claimed.");
-//            } else {
-//                System.out.println("ERROR: " + http.getResponseMessage());
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
     }
 
-
-    private static String readString(InputStream is) throws IOException {
-        StringBuilder sb = new StringBuilder();
-        InputStreamReader sr = new InputStreamReader(is);
-        char[] buf = new char[1024];
-        int len;
-        while ((len = sr.read(buf)) > 0) {
-            sb.append(buf, 0, len);
-        }
-        return sb.toString();
-    }
-
-    private class RequestTask extends AsyncTask<URL, Integer, JSONObject> {
+    private class LoginTask extends AsyncTask<URL, Integer, JSONObject> {
 
         protected JSONObject doInBackground(URL... urls)
         {
             JSONObject output = null;
-            Client client = new Client("http://192.168.1.142:",8080);
-            String reqData = "{" + "\"userName\": \"mbrann\",\"password\": \"leonandada\"" + "}";
-            output = client.makeRequest("/user/login", reqData);
+            Client client = new Client(input_url);
+            String reqData = "{" + "\"userName\": \"" + user_name.getText().toString() + "\",\"password\": \"" + password.getText().toString() + "\"" + "}";
+            output = client.makeLoginRequest("/user/login", reqData);
             return output;
         }
 
@@ -113,15 +93,72 @@ public class LoginFragment extends Fragment {
         protected void onPostExecute(JSONObject result)
         {
             String thing = "";
+            String success = "";
+            String first_name = "";
+            String last_name = "";
             try
             {
                 thing = result.get("userName").toString();
+                person_id = result.get("personID").toString();
+                auth_token = result.get("authToken").toString();
+                success = result.get("success").toString();
             }
             catch(Exception  e)
             {
                 e.getMessage();
             }
-            System.out.println(thing);
+
+            if (success == "true")
+            {
+                try {
+                    GetUserTask user_task = new GetUserTask();
+                    input_url = "http://" + server_host.getText().toString() + ":" + server_port.getText().toString();
+                    user_task.execute(new URL(input_url));
+                }
+                catch(Exception e)
+                {
+                    e.getMessage();
+                }
+            }
+            else
+            {
+                Toast toast= Toast.makeText(getActivity().getApplicationContext(), "Login Failed", Toast.LENGTH_LONG);
+                toast.show();
+            }
+        }
+    }
+
+    private class GetUserTask extends AsyncTask<URL, Integer, JSONObject> {
+
+        protected JSONObject doInBackground(URL... urls)
+        {
+            JSONObject output = null;
+            Client client = new Client(input_url);
+            String reqData = "{" + "\"userName\": \"" + user_name.getText().toString() + "\",\"password\": \"" + password.getText().toString() + "\"" + "}";
+            client.setAuth(auth_token);
+            output = client.makePersonRequest("/person/" + person_id, reqData);
+            return output;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+
+        }
+
+        protected void onPostExecute(JSONObject result)
+        {
+            String first_name = "";
+            String last_name = "";
+            try
+            {
+                first_name = result.get("firstName").toString();
+                last_name = result.get("lastName").toString();
+                Toast toast= Toast.makeText(getActivity().getApplicationContext(), "Welcome " + first_name + " " + last_name, Toast.LENGTH_LONG);
+                toast.show();
+            }
+            catch(Exception  e)
+            {
+                e.getMessage();
+            }
         }
     }
 }
