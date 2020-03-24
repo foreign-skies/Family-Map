@@ -26,7 +26,7 @@ public class Client
         auth_token = auth_in;
     }
 
-    public JSONObject makeLoginRequest(String url_extension, String req_data)
+    public JSONObject makePostRequest(String url_extension, String req_data)
     {
         JSONObject output = null;
 
@@ -74,6 +74,7 @@ public class Client
 
         return output;
     }
+
 
     public JSONObject makePersonRequest(String url_extension, String req_data)
     {

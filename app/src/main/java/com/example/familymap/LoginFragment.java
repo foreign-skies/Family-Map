@@ -5,11 +5,13 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import org.json.JSONObject;
@@ -28,14 +30,26 @@ public class LoginFragment extends Fragment {
     private String auth_token;
 
     private Button sign_in;
+    private Button register;
+
+    private RadioButton male;
+    private RadioButton female;
     private EditText server_host;
     private EditText server_port;
     private EditText user_name;
     private EditText password;
+    private EditText first_name;
+    private EditText last_name;
+    private EditText email;
+
+    boolean male_selected;
+    boolean female_selected;
 
     public LoginFragment() {
         // Required empty public constructor
         input_url = "";
+        male_selected = false;
+        female_selected = false;
     }
 
 
@@ -48,7 +62,15 @@ public class LoginFragment extends Fragment {
         server_port = (EditText) view.findViewById(R.id.server_port_edit_text);
         user_name = (EditText) view.findViewById(R.id.username_edit_text);
         password = (EditText) view.findViewById(R.id.password_edit_text);
+        first_name = (EditText) view.findViewById(R.id.first_name_edit_text);
+        last_name = (EditText) view.findViewById(R.id.last_name_edit_text);
+        email = (EditText) view.findViewById(R.id.email_edit_text);
         sign_in = (Button) view.findViewById(R.id.sign_in_button);
+        register = (Button) view.findViewById(R.id.register_button);
+        register.setEnabled(false);
+        male = (RadioButton)view.findViewById(R.id.radio_male);
+        female = (RadioButton)view.findViewById(R.id.radio_female);
+
         sign_in.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -56,12 +78,48 @@ public class LoginFragment extends Fragment {
             }
         });
 
+        register.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                attemptRegister();
+            }
+        });
+
+        male.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               male_selected = true;
+               female_selected = false;
+               if (checkRegButton())
+                   register.setEnabled(true);
+            }
+        });
+
+        female.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                female_selected = true;
+                male_selected = false;
+                if (checkRegButton())
+                    register.setEnabled(true);
+            }
+        });
+
         return view;
     }
 
-    public void attemptSignIn() {
-        System.out.println("this happened");
-        // System.out.println(server_host.getText().toString());
+    private boolean checkRegButton()
+    {
+        if (!TextUtils.isEmpty(server_port.getText()) && !TextUtils.isEmpty(server_host.getText()) && !TextUtils.isEmpty(user_name.getText()) &&
+                !TextUtils.isEmpty(password.getText()) && !TextUtils.isEmpty(first_name.getText()) && !TextUtils.isEmpty(last_name.getText()) && !TextUtils.isEmpty(email.getText()))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    private void attemptSignIn() {
+
         try
         {
             input_url = "http://" + server_host.getText().toString() + ":" + server_port.getText().toString();
@@ -75,6 +133,23 @@ public class LoginFragment extends Fragment {
 
     }
 
+    private void attemptRegister()
+    {
+        if (checkRegButton())
+        {
+            try
+            {
+                input_url = "http://" + server_host.getText().toString() + ":" + server_port.getText().toString();
+                RegisterTask task = new RegisterTask();
+                task.execute(new URL(input_url));
+            }
+            catch (MalformedURLException e)
+            {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
     private class LoginTask extends AsyncTask<URL, Integer, JSONObject> {
 
         protected JSONObject doInBackground(URL... urls)
@@ -82,7 +157,7 @@ public class LoginFragment extends Fragment {
             JSONObject output = null;
             Client client = new Client(input_url);
             String reqData = "{" + "\"userName\": \"" + user_name.getText().toString() + "\",\"password\": \"" + password.getText().toString() + "\"" + "}";
-            output = client.makeLoginRequest("/user/login", reqData);
+            output = client.makePostRequest("/user/login", reqData);
             return output;
         }
 
@@ -158,6 +233,54 @@ public class LoginFragment extends Fragment {
             catch(Exception  e)
             {
                 e.getMessage();
+            }
+        }
+    }
+
+    private class RegisterTask extends AsyncTask<URL, Integer, JSONObject> {
+
+        protected JSONObject doInBackground(URL... urls)
+        {
+            String gender = "";
+            if (male_selected)
+            {
+                gender = "m";
+            }
+            else
+            {
+                gender = "f";
+            }
+            JSONObject output = null;
+            Client client = new Client(input_url);
+            String reqData = "{" + "\"userName\": \"" + user_name.getText().toString() + "\",\"password\": \"" + password.getText().toString() + "\",\"email\": \"" + email.getText().toString() + "\",\"firstName\": \"" + first_name.getText().toString() + "\",\"lastName\": \"" + last_name.getText().toString() + "\",\"gender\": \"" + gender + "\"}";
+            output = client.makePostRequest("/user/register", reqData);
+            return output;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+
+        }
+
+        protected void onPostExecute(JSONObject result)
+        {
+            String success = "";
+            try
+            {
+                success = result.get("success").toString();
+            }
+            catch(Exception e)
+            {
+                e.getMessage();
+            }
+            if (success == "true")
+            {
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Welcome " + first_name.getText().toString() + " " + last_name.getText().toString(), Toast.LENGTH_LONG);
+                toast.show();
+            }
+            else
+            {
+                Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Failed. Username already exists", Toast.LENGTH_LONG);
+                toast.show();
             }
         }
     }
