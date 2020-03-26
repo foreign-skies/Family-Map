@@ -1,4 +1,4 @@
-package com.example.familymap;
+package com.example.UI;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -16,8 +16,9 @@ import android.widget.Toast;
 
 import org.json.JSONObject;
 
-import java.io.*;
 import java.net.*;
+
+import Client.Client;
 
 
 /**

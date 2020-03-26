@@ -1,4 +1,4 @@
-package com.example.familymap;
+package com.example.UI;
 
 import org.junit.Test;
 

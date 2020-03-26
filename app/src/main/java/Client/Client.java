@@ -1,4 +1,4 @@
-package com.example.familymap;
+package Client;
 
 import org.json.JSONObject;
 
