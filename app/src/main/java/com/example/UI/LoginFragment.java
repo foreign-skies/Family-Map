@@ -213,9 +213,8 @@ public class LoginFragment extends Fragment {
         {
             JSONObject output = null;
             Client client = new Client(input_url);
-            String reqData = "{" + "\"userName\": \"" + user_name.getText().toString() + "\",\"password\": \"" + password.getText().toString() + "\"" + "}";
             client.setAuth(auth_token);
-            output = client.makePersonRequest("/person/" + person_id, reqData);
+            output = client.makePersonRequest("/person/" + person_id);
             return output;
         }
 
@@ -256,7 +255,7 @@ public class LoginFragment extends Fragment {
 
                 Toast toast= Toast.makeText(getActivity().getApplicationContext(), "Welcome " + first_name + " " + last_name, Toast.LENGTH_LONG);
                 toast.show();
-                MapFragment map_fragment = new MapFragment(person);
+                MapFragment map_fragment = new MapFragment(person,auth_token);
                 FragmentManager fragment_manager = getChildFragmentManager();
                 fragment_manager.beginTransaction().add(R.id.container, map_fragment).commit();
             }

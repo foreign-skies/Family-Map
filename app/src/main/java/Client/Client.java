@@ -76,7 +76,7 @@ public class Client
     }
 
 
-    public JSONObject makePersonRequest(String url_extension, String req_data)
+    public JSONObject makePersonRequest(String url_extension)
     {
         JSONObject output = null;
 
