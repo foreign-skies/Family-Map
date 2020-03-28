@@ -16,13 +16,16 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import Model.Person;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class MapFragment extends Fragment implements OnMapReadyCallback {
+    Person user;
 
-    public MapFragment() {
-        // Required empty public constructor
+    public MapFragment(Person user_in) {
+        user = user_in;
     }
 
     GoogleMap map;

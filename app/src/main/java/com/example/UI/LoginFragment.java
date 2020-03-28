@@ -1,9 +1,11 @@
 package com.example.UI;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -19,6 +21,7 @@ import org.json.JSONObject;
 import java.net.*;
 
 import Client.Client;
+import Model.Person;
 
 
 /**
@@ -222,14 +225,40 @@ public class LoginFragment extends Fragment {
 
         protected void onPostExecute(JSONObject result)
         {
+            String associated_username = "";
+            String person_id = "";
             String first_name = "";
             String last_name = "";
+            String gender = "";
+            String father_id = "";
+            String mother_id = "";
+            String spouse_id = "";
             try
             {
+                associated_username = result.get("associatedUsername").toString();
+                person_id = result.get("personID").toString();
                 first_name = result.get("firstName").toString();
                 last_name = result.get("lastName").toString();
+                gender = result.get("gender").toString();
+                father_id = result.get("fatherID").toString();
+                mother_id = result.get("motherID").toString();
+                spouse_id = result.get("spouseID").toString();
+
+                Person person = new Person();
+                person.setAssociatedUsername(associated_username);
+                person.setPersonID(person_id);
+                person.setFirstName(first_name);
+                person.setLastName(last_name);
+                person.setGender(gender);
+                person.setFatherID(father_id);
+                person.setMotherID(mother_id);
+                person.setSpouseID(spouse_id);
+
                 Toast toast= Toast.makeText(getActivity().getApplicationContext(), "Welcome " + first_name + " " + last_name, Toast.LENGTH_LONG);
                 toast.show();
+                MapFragment map_fragment = new MapFragment(person);
+                FragmentManager fragment_manager = getChildFragmentManager();
+                fragment_manager.beginTransaction().add(R.id.container, map_fragment).commit();
             }
             catch(Exception  e)
             {
@@ -277,6 +306,17 @@ public class LoginFragment extends Fragment {
             {
                 Toast toast = Toast.makeText(getActivity().getApplicationContext(), "Welcome " + first_name.getText().toString() + " " + last_name.getText().toString(), Toast.LENGTH_LONG);
                 toast.show();
+                try
+                {
+                    LoginTask login_task = new LoginTask();
+                    input_url = "http://" + server_host.getText().toString() + ":" + server_port.getText().toString();
+                    login_task.execute(new URL(input_url));
+                }
+                catch(Exception e)
+                {
+                    e.getMessage();
+                }
+
             }
             else
             {

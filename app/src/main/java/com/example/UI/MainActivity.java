@@ -45,13 +45,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        login_fragment = new LoginFragment();
-//        fragment_manager = this.getSupportFragmentManager();
-//        fragment_manager.beginTransaction().add(R.id.container, login_fragment).commit();
-
-        map_fragment = new MapFragment();
+        login_fragment = new LoginFragment();
         fragment_manager = this.getSupportFragmentManager();
-        fragment_manager.beginTransaction().add(R.id.container, map_fragment).commit();
+        fragment_manager.beginTransaction().add(R.id.container, login_fragment).commit();
+
+//        map_fragment = new MapFragment();
+//        fragment_manager = this.getSupportFragmentManager();
+//        fragment_manager.beginTransaction().add(R.id.container, map_fragment).commit();
 
     }
 }
