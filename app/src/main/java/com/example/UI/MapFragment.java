@@ -1,5 +1,6 @@
 package com.example.UI;
 
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -9,6 +10,8 @@ import androidx.fragment.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.UI.R;
@@ -16,7 +19,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -24,6 +29,7 @@ import org.json.JSONObject;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import Client.Client;
 import Model.Event;
@@ -32,10 +38,14 @@ import Model.Person;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private Person user;
     private ArrayList<Event> event_list = new ArrayList<Event>();
     private String auth_token;
+    private HashMap<String, Integer> event_color_map = new HashMap<String,Integer>();
+
+    private ImageView gender_image;
+    private TextView event_text_view;
 
     public MapFragment(Person user_in, String auth_token_in) {
         user = user_in;
@@ -57,6 +67,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
     }
+
 
     private class GetEventsTask extends AsyncTask<URL, Integer, JSONObject> {
 
@@ -104,6 +115,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_map, container, false);
+        gender_image = (ImageView)view.findViewById(R.id.gender_image);
+        event_text_view = (TextView) view.findViewById(R.id.map_event_text);
+
         getEvents();
          SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
          mapFragment.getMapAsync(this);
@@ -114,11 +128,61 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public void onMapReady(GoogleMap googleMap)
     {
         map = googleMap;
+        int hue_counter = 0;
         for (int i = 0; i < event_list.size(); i++)
         {
+            float hue = 120;  //(Range: 0 to 360)
+            if (event_color_map.containsKey(event_list.get(i).getEventType()))
+            {
+                hue = event_color_map.get(event_list.get(i).getEventType());
+            }
+            else
+            {
+                event_color_map.put(event_list.get(i).getEventType(), hue_counter);
+                hue = hue_counter;
+                hue_counter += 60;
+            }
+
             LatLng event_loc = new LatLng(event_list.get(i).getLatitude(),event_list.get(i).getLongitude());
-            map.addMarker(new MarkerOptions().position(event_loc).title(event_list.get(i).getEventID()));
+            map.addMarker(new MarkerOptions().position(event_loc).title(event_list.get(i).getEventID()).icon(BitmapDescriptorFactory
+                    .defaultMarker(hue)));
             map.moveCamera(CameraUpdateFactory.newLatLng(event_loc));
+
+           map.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) this);
+
+
         }
+
+
     }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        String marker_name = marker.getTitle();
+        String output_string = "";
+        Event selected_event = null;
+        for(int i = 0 ; i< event_list.size(); i++)
+        {
+            if (event_list.get(i).getEventID().equals(marker_name))
+            {
+                selected_event = event_list.get(i);
+                break;
+            }
+        }
+        output_string += selected_event.getPersonID();
+        output_string += " ";
+        output_string += selected_event.getEventID();
+        output_string += " ";
+        output_string += selected_event.getCity();
+        output_string += " ";
+        output_string += selected_event.getCountry();
+        output_string += " ";
+        output_string += selected_event.getYear();
+        event_text_view.setText(output_string);
+
+
+        return false;
+
+    }
+
 }
