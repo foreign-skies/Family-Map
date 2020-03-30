@@ -1,5 +1,6 @@
 package com.example.UI;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -117,11 +118,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         View view = inflater.inflate(R.layout.fragment_map, container, false);
         gender_image = (ImageView)view.findViewById(R.id.gender_image);
         event_text_view = (TextView) view.findViewById(R.id.map_event_text);
+        event_text_view.setText("Click on a marker to see event details");
+        event_text_view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent( getActivity(), PersonActivity.class);
+                startActivity(i);
+            }
+        });
 
         getEvents();
-         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-         mapFragment.getMapAsync(this);
-         return view;
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
+        return view;
     }
 
     @Override
@@ -169,7 +178,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 break;
             }
         }
-        output_string += selected_event.getPersonID();
+        output_string += user.getFirstName();
+        output_string += " ";
+        output_string += user.getLastName();
         output_string += " ";
         output_string += selected_event.getEventID();
         output_string += " ";
@@ -179,7 +190,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         output_string += " ";
         output_string += selected_event.getYear();
         event_text_view.setText(output_string);
+        event_text_view.setVisibility(View.VISIBLE);
+        gender_image.setVisibility(View.VISIBLE);
 
+        if (user.getGender().equals("f"))
+        {
+            gender_image.setColorFilter(getContext().getResources().getColor(R.color.pink));
+        }
+        if (user.getGender().equals("m"))
+        {
+            gender_image.setColorFilter(getContext().getResources().getColor(R.color.blue));
+        }
 
         return false;
 
