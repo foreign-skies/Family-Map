@@ -44,6 +44,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private ArrayList<Event> event_list = new ArrayList<Event>();
     private String auth_token;
     private HashMap<String, Integer> event_color_map = new HashMap<String,Integer>();
+    private String passing_person_id;
+    private Person current_person;
 
     private ImageView gender_image;
     private TextView event_text_view;
@@ -51,9 +53,75 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public MapFragment(Person user_in, String auth_token_in) {
         user = user_in;
         auth_token = auth_token_in;
+        passing_person_id = null;
+        current_person = new Person();
     }
 
     GoogleMap map;
+
+    private class GetPersonTask extends AsyncTask<URL, Integer, JSONObject> {
+
+        protected JSONObject doInBackground(URL... urls)
+        {
+            JSONObject output = null;
+            Client client = new Client("http://192.168.1.142:8080");
+            client.setAuth(auth_token);
+            output = client.makePersonRequest("/person/" + passing_person_id);
+            String associated_username = "";
+            String person_id = "";
+            String first_name = "";
+            String last_name = "";
+            String gender = "";
+            String father_id = "";
+            String mother_id = "";
+            String spouse_id = "";
+            try {
+                associated_username = output.get("associatedUsername").toString();
+                person_id = output.get("personID").toString();
+                first_name = output.get("firstName").toString();
+                last_name = output.get("lastName").toString();
+                gender = output.get("gender").toString();
+                try{father_id = output.get("fatherID").toString();}
+                catch(Exception e)
+                {
+                    father_id = null;
+                }
+                try{father_id = output.get("motherID").toString();}
+                catch(Exception e)
+                {
+                    mother_id = null;
+                }
+                try{father_id = output.get("spouseID").toString();}
+                catch(Exception e)
+                {
+                    spouse_id = null;
+                }
+
+                current_person.setAssociatedUsername(associated_username);
+                current_person.setPersonID(person_id);
+                current_person.setFirstName(first_name);
+                current_person.setLastName(last_name);
+                current_person.setGender(gender);
+                current_person.setFatherID(father_id);
+                current_person.setMotherID(mother_id);
+                current_person.setSpouseID(spouse_id);
+
+            }
+            catch (Exception e) {
+                e.getMessage();
+            }
+            return output;
+        }
+
+        protected void onProgressUpdate(Integer... progress) {
+
+        }
+
+        protected void onPostExecute(JSONObject result) {
+
+        }
+
+    }
 
     private void getEvents()
     {
@@ -68,6 +136,20 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
     }
+
+    private void getPerson()
+    {
+        try
+        {
+            GetPersonTask task = new GetPersonTask();
+            task.execute(new URL("http://192.168.1.142:8080")).get();
+        }
+        catch(Exception e)
+        {
+            e.getMessage();
+        }
+    }
+
 
 
     private class GetEventsTask extends AsyncTask<URL, Integer, JSONObject> {
@@ -141,6 +223,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         for (int i = 0; i < event_list.size(); i++)
         {
             float hue = 120;  //(Range: 0 to 360)
+            if (hue + hue_counter > 359)
+            {
+                hue_counter = 0;
+            }
             if (event_color_map.containsKey(event_list.get(i).getEventType()))
             {
                 hue = event_color_map.get(event_list.get(i).getEventType());
@@ -153,8 +239,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
 
             LatLng event_loc = new LatLng(event_list.get(i).getLatitude(),event_list.get(i).getLongitude());
+
             map.addMarker(new MarkerOptions().position(event_loc).title(event_list.get(i).getEventID()).icon(BitmapDescriptorFactory
-                    .defaultMarker(hue)));
+                        .defaultMarker(hue)));
+
             map.moveCamera(CameraUpdateFactory.newLatLng(event_loc));
 
            map.setOnMarkerClickListener((GoogleMap.OnMarkerClickListener) this);
@@ -178,26 +266,29 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 break;
             }
         }
-        output_string += user.getFirstName();
+        passing_person_id = selected_event.getPersonID();
+        getPerson();
+        output_string += current_person.getFirstName();
         output_string += " ";
-        output_string += user.getLastName();
-        output_string += " ";
-        output_string += selected_event.getEventID();
-        output_string += " ";
+        output_string += current_person.getLastName();
+        output_string += "\n";
+        output_string += selected_event.getEventType();
+        output_string += ": ";
         output_string += selected_event.getCity();
-        output_string += " ";
+        output_string += ", ";
         output_string += selected_event.getCountry();
-        output_string += " ";
+        output_string += " (";
         output_string += selected_event.getYear();
+        output_string += " )";
         event_text_view.setText(output_string);
         event_text_view.setVisibility(View.VISIBLE);
         gender_image.setVisibility(View.VISIBLE);
 
-        if (user.getGender().equals("f"))
+        if (current_person.getGender().equals("f"))
         {
             gender_image.setColorFilter(getContext().getResources().getColor(R.color.pink));
         }
-        if (user.getGender().equals("m"))
+        if (current_person.getGender().equals("m"))
         {
             gender_image.setColorFilter(getContext().getResources().getColor(R.color.blue));
         }
@@ -207,3 +298,4 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     }
 
 }
+

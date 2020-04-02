@@ -44,7 +44,7 @@
 			android:background="@color/Snow"
 			android:text="Suzanna Mccants BIRTH: Minneapolis, United States (1976)"
 			android:textStyle="bold"
-			android:textSize="25sp"
+			android:textSize="20sp"
 			/>
 			
 			<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
