@@ -227,15 +227,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             {
                 hue_counter = 0;
             }
-            if (event_color_map.containsKey(event_list.get(i).getEventType()))
+            if (event_color_map.containsKey(event_list.get(i).getEventType().toLowerCase()))
             {
-                hue = event_color_map.get(event_list.get(i).getEventType());
+                    hue = event_color_map.get(event_list.get(i).getEventType().toLowerCase());
             }
             else
             {
-                event_color_map.put(event_list.get(i).getEventType(), hue_counter);
+                event_color_map.put(event_list.get(i).getEventType().toLowerCase(), hue_counter);
                 hue = hue_counter;
-                hue_counter += 60;
+                hue_counter += 24;
             }
 
             LatLng event_loc = new LatLng(event_list.get(i).getLatitude(),event_list.get(i).getLongitude());

@@ -5,5 +5,288 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.UI.SettingsActivity">
+	
+	<RelativeLayout
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent">
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Life Story Lines"
+			android:id="@+id/life_story_text"
+			android:textSize="20sp"
+			android:textStyle="bold"
+        />
+		
+		<Switch
+			android:id="@+id/life_story_switch"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_marginTop="10dp"
+        />
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Show Life Story Lines"
+			android:id="@+id/life_story_details"
+			android:textSize="18sp"
+			android:layout_below="@+id/life_story_text"
+        />
+		<View
+			android:id="@+id/settings_divider_1"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="@android:color/darker_gray"
+			android:layout_below="@+id/life_story_details"
+		/>
+		
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Family Tree Lines"
+			android:id="@+id/family_tree_text"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:layout_below="@+id/settings_divider_1"
+        />
+		
+		<Switch
+			android:id="@+id/family_lines_switch"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_below="@+id/life_story_switch"
+			android:layout_marginTop="25dp"
+        />
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Show Family Tree Lines"
+			android:id="@+id/family_tree_details"
+			android:textSize="18sp"
+			android:layout_below="@+id/family_tree_text"
+        />
+		<View
+			android:id="@+id/settings_divider_2"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="@android:color/darker_gray"
+			android:layout_below="@+id/family_tree_details"
+		/>
+		
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Spouse Lines"
+			android:id="@+id/spouse_lines_text"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:layout_below="@+id/settings_divider_2"
+        />
+		
+		<Switch
+			android:id="@+id/spouse_lines_switch"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_below="@+id/family_lines_switch"
+			android:layout_marginTop="25dp"
+        />
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Show Spouse Lines"
+			android:id="@+id/spouse_lines_details"
+			android:textSize="18sp"
+			android:layout_below="@+id/spouse_lines_text"
+        />
+		<View
+			android:id="@+id/settings_divider_3"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="@android:color/darker_gray"
+			android:layout_below="@+id/spouse_lines_details"
+		/>
+		
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Father's Side"
+			android:id="@+id/father_side_text"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:layout_below="@+id/settings_divider_3"
+        />
+		
+		<Switch
+			android:id="@+id/father_side_switch"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_below="@+id/spouse_lines_switch"
+			android:layout_marginTop="25dp"
+        />
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Filter By Father's Side Of Family"
+			android:id="@+id/father_side_details"
+			android:textSize="18sp"
+			android:layout_below="@+id/father_side_text"
+        />
+		<View
+			android:id="@+id/settings_divider_4"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="@android:color/darker_gray"
+			android:layout_below="@+id/father_side_details"
+		/>
+		
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Mother's Side"
+			android:id="@+id/mother_side_text"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:layout_below="@+id/settings_divider_4"
+        />
+		
+		<Switch
+			android:id="@+id/mother_side_switch"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_below="@+id/father_side_switch"
+			android:layout_marginTop="25dp"
+        />
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Filter By Mother's Side Of Family"
+			android:id="@+id/mother_side_details"
+			android:textSize="18sp"
+			android:layout_below="@+id/mother_side_text"
+        />
+		<View
+			android:id="@+id/settings_divider_5"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="@android:color/darker_gray"
+			android:layout_below="@+id/mother_side_details"
+		/>
+		
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Male Events"
+			android:id="@+id/male_events_text"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:layout_below="@+id/settings_divider_5"
+        />
+		
+		<Switch
+			android:id="@+id/male_events_switch"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_below="@+id/mother_side_switch"
+			android:layout_marginTop="25dp"
+        />
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Filter Events Based On Gender"
+			android:id="@+id/male_events_details"
+			android:textSize="18sp"
+			android:layout_below="@+id/male_events_text"
+        />
+		<View
+			android:id="@+id/settings_divider_6"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="@android:color/darker_gray"
+			android:layout_below="@+id/male_events_details"
+		/>
+		
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Female Events"
+			android:id="@+id/female_events_text"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:layout_below="@+id/settings_divider_6"
+        />
+		
+		<Switch
+			android:id="@+id/female_events_switch"
+			android:layout_height="wrap_content"
+			android:layout_width="wrap_content"
+			android:layout_alignParentRight="true"
+			android:layout_below="@+id/male_events_switch"
+			android:layout_marginTop="25dp"
+        />
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Filter Events Based On Gender"
+			android:id="@+id/female_events_details"
+			android:textSize="18sp"
+			android:layout_below="@+id/female_events_text"
+        />
+		<View
+			android:id="@+id/settings_divider_7"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="@android:color/darker_gray"
+			android:layout_below="@+id/female_events_details"
+		/>
+		
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Logout"
+			android:id="@+id/logout_text"
+			android:textSize="20sp"
+			android:textStyle="bold"
+			android:layout_below="@+id/settings_divider_7"
+        />
+		
+		<TextView
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:text="Return To Login Screen"
+			android:id="@+id/logout_details"
+			android:textSize="18sp"
+			android:layout_below="@+id/logout_text"
+        />
+		<View
+			android:id="@+id/settings_divider_8"
+			android:layout_width="match_parent"
+			android:layout_height="1dp"
+			android:background="@android:color/darker_gray"
+			android:layout_below="@+id/logout_details"
+		/>
+		
+	</RelativeLayout>
+	
 
 </androidx.constraintlayout.widget.ConstraintLayout>
