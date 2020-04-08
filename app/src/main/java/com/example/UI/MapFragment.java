@@ -5,10 +5,13 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -49,6 +52,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private ImageView gender_image;
     private TextView event_text_view;
+
 
     public MapFragment(Person user_in, String auth_token_in) {
         user = user_in;
@@ -193,6 +197,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
     }
 
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater)
+    {
+        inflater.inflate(R.menu.map_menu, menu);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -212,6 +223,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         getEvents();
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+        setHasOptionsMenu(true);
         return view;
     }
 
@@ -297,5 +309,15 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (map != null) { //prevent crashing if the map doesn't exist yet (eg. on starting activity)
+            map.clear();
+            SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+            mapFragment.getMapAsync(this);
+        }
+    }
 }
 
