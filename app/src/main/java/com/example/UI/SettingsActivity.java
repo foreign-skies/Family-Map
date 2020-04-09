@@ -46,6 +46,21 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
+        if(SettingsBase.getLifeStoryLines() == true)
+            life_story_switch.setChecked(true);
+        if(SettingsBase.getFamilyTreeLines() == true)
+            family_tree_switch.setChecked(true);
+        if(SettingsBase.getSpouseLines() == true)
+            spouse_switch.setChecked(true);
+        if (SettingsBase.getFatherSide() == true)
+            father_side_switch.setChecked(true);
+        if (SettingsBase.getMotherSide() == true)
+            mother_side_switch.setChecked(true);
+        if (SettingsBase.getMaleEvents() == true)
+            male_events_switch.setChecked(true);
+        if (SettingsBase.getFemaleEvents() == true)
+            female_events_switch.setChecked(true);
+
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setTitle("FamilyMap: Settings");
