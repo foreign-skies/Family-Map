@@ -9,6 +9,7 @@ public class SettingsBase
     private static boolean mother_side;
     private static boolean male_events;
     private static boolean female_events;
+    private static boolean logout;
 
     private SettingsBase()
     {
@@ -19,6 +20,7 @@ public class SettingsBase
         mother_side = false;
         male_events = false;
         female_events = false;
+        logout = false;
     }
     private static SettingsBase my_settings_base;
     public static boolean getLifeStoryLines()
@@ -82,5 +84,14 @@ public class SettingsBase
     public static void setFemaleEvents(boolean input)
     {
         female_events = input;
+    }
+
+    public static boolean getLogout()
+    {
+        return logout;
+    }
+    public static void setLogout(boolean input)
+    {
+        logout = input;
     }
 }
