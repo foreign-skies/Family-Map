@@ -54,7 +54,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private String passing_person_id;
     private Person current_person;
     private Event current_earliest_event;
-    List<Polyline> polyline_list;
+    private List<Polyline> polyline_list;
 
     private ImageView gender_image;
     private TextView event_text_view;
@@ -323,16 +323,63 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         //draw lines
         if (SettingsBase.getSpouseLines() == true)
         {
+            SpouseLines(selected_event);
+        }
+        if (SettingsBase.getFamilyTreeLines() == true)
+        {
+            FamilyTreeLines(selected_event,10);
+        }
+
+        return false;
+
+    }
+
+    private void FamilyTreeLines(Event selected_event, int line_size)
+    {
+        Person local_person = new Person();
+        local_person.setSpouseID(current_person.getSpouseID());
+        local_person.setMotherID(current_person.getMotherID());
+        local_person.setFatherID(current_person.getFatherID());
+        local_person.setGender(current_person.getGender());
+        local_person.setLastName(current_person.getLastName());
+        local_person.setFirstName(current_person.getFirstName());
+        local_person.setPersonID(current_person.getPersonID());
+        local_person.setAssociatedUsername(current_person.getAssociatedUsername());
+            if (current_person.getFatherID() != null) {
+                try {
+                    passing_person_id = current_person.getFatherID();
+                    getEarliestPersonEvent();
+                    LatLng selected_event_loc = new LatLng(selected_event.getLatitude(), selected_event.getLongitude());
+                    LatLng spouse_event_loc = new LatLng(current_earliest_event.getLatitude(), current_earliest_event.getLongitude());
+                    Polyline line = map.addPolyline(new PolylineOptions()
+                            .add(selected_event_loc, spouse_event_loc)
+                            .width(line_size)
+                            .color(Color.RED));
+                    polyline_list.add(line);
+                    getPerson();
+                    FamilyTreeLines(current_earliest_event, line_size - 4);
+
+                } catch (Exception e) {
+                    e.getMessage();
+                }
+            }
+
+            current_person = local_person;
+        if (current_person.getMotherID() != null)
+        {
             try {
-                passing_person_id = current_person.getSpouseID();
+                passing_person_id = current_person.getMotherID();
                 getEarliestPersonEvent();
-                LatLng selected_event_loc = new LatLng(selected_event.getLatitude(),selected_event.getLongitude());
-                LatLng spouse_event_loc = new LatLng(current_earliest_event.getLatitude(),current_earliest_event.getLongitude());
+                LatLng selected_event_loc = new LatLng(selected_event.getLatitude(), selected_event.getLongitude());
+                LatLng spouse_event_loc = new LatLng(current_earliest_event.getLatitude(), current_earliest_event.getLongitude());
                 Polyline line = map.addPolyline(new PolylineOptions()
                         .add(selected_event_loc, spouse_event_loc)
-                        .width(5)
+                        .width(line_size)
                         .color(Color.RED));
                 polyline_list.add(line);
+                getPerson();
+                FamilyTreeLines(current_earliest_event, line_size - 4);
+
             }
             catch(Exception e)
             {
@@ -340,8 +387,25 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             }
         }
 
-        return false;
+    }
 
+    private void SpouseLines(Event selected_event)
+    {
+        try {
+            passing_person_id = current_person.getSpouseID();
+            getEarliestPersonEvent();
+            LatLng selected_event_loc = new LatLng(selected_event.getLatitude(),selected_event.getLongitude());
+            LatLng spouse_event_loc = new LatLng(current_earliest_event.getLatitude(),current_earliest_event.getLongitude());
+            Polyline line = map.addPolyline(new PolylineOptions()
+                    .add(selected_event_loc, spouse_event_loc)
+                    .width(5)
+                    .color(Color.RED));
+            polyline_list.add(line);
+        }
+        catch(Exception e)
+        {
+            e.getMessage();
+        }
     }
 
     private void getEarliestPersonEvent()
