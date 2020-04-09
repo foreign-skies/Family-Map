@@ -55,6 +55,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private Person current_person;
     private Event current_earliest_event;
     private List<Polyline> polyline_list;
+    List<String> father_side;
+    List<String> mother_side;
 
     private ImageView gender_image;
     private TextView event_text_view;
@@ -67,6 +69,37 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         current_person = new Person();
         current_earliest_event = new Event();
         polyline_list = new ArrayList<Polyline>();
+
+        father_side = new ArrayList<String>();
+        mother_side = new ArrayList<String>();
+        father_side.add(user.getPersonID());
+        mother_side.add(user.getPersonID());
+        passing_person_id = user.getPersonID();
+        getPerson();
+        Person local_person = new Person();
+        local_person.setSpouseID(current_person.getSpouseID());
+        local_person.setMotherID(current_person.getMotherID());
+        local_person.setFatherID(current_person.getFatherID());
+        local_person.setGender(current_person.getGender());
+        local_person.setLastName(current_person.getLastName());
+        local_person.setFirstName(current_person.getFirstName());
+        local_person.setPersonID(current_person.getPersonID());
+
+        while (current_person.getFatherID() != null)
+        {
+            passing_person_id = current_person.getFatherID();
+            getPerson();
+            father_side.add(current_person.getPersonID());
+        }
+        current_person = local_person;
+        while (current_person.getMotherID() != null)
+        {
+            passing_person_id = current_person.getMotherID();
+            getPerson();
+            mother_side.add(current_person.getPersonID());
+        }
+        System.out.println(father_side.size());
+        System.out.println(mother_side.size());
 
     }
 
@@ -201,6 +234,30 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
                     //begin filters
                     boolean dont_add = false;
+                    if (SettingsBase.getFatherSide() == true)
+                    {
+                        for (int j = 0; j < father_side.size(); j++)
+                        {
+                            if (father_side.get(j).equals(add_event.getPersonID()))
+                            {
+                                dont_add = false;
+                                break;
+                            }
+                            dont_add = true;
+                        }
+                    }
+                    if (SettingsBase.getMotherSide() == true)
+                    {
+                        for (int j = 0; j < mother_side.size(); j++)
+                        {
+                            if (mother_side.get(j).equals(add_event.getPersonID()))
+                            {
+                                dont_add = false;
+                                break;
+                            }
+                            dont_add = true;
+                        }
+                    }
                     if (SettingsBase.getFemaleEvents() == true)
                     {
                         passing_person_id = add_event.getPersonID();
