@@ -1,6 +1,7 @@
 package com.example.UI;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,6 +28,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,6 +37,7 @@ import org.json.JSONObject;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import Client.Client;
 import Model.Event;
@@ -49,6 +53,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private HashMap<String, Integer> event_color_map = new HashMap<String,Integer>();
     private String passing_person_id;
     private Person current_person;
+    private Event current_earliest_event;
+    List<Polyline> polyline_list;
 
     private ImageView gender_image;
     private TextView event_text_view;
@@ -59,6 +65,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         auth_token = auth_token_in;
         passing_person_id = null;
         current_person = new Person();
+        current_earliest_event = new Event();
+        polyline_list = new ArrayList<Polyline>();
+
     }
 
     GoogleMap map;
@@ -90,12 +99,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 {
                     father_id = null;
                 }
-                try{father_id = output.get("motherID").toString();}
+                try{mother_id = output.get("motherID").toString();}
                 catch(Exception e)
                 {
                     mother_id = null;
                 }
-                try{father_id = output.get("spouseID").toString();}
+                try{spouse_id = output.get("spouseID").toString();}
                 catch(Exception e)
                 {
                     spouse_id = null;
@@ -267,6 +276,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public boolean onMarkerClick(Marker marker) {
+        for(Polyline line : polyline_list)
+        {
+            line.remove();
+        }
+        polyline_list.clear();
+
         String marker_name = marker.getTitle();
         String output_string = "";
         Event selected_event = null;
@@ -305,8 +320,46 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             gender_image.setColorFilter(getContext().getResources().getColor(R.color.blue));
         }
 
+        //draw lines
+        if (SettingsBase.getSpouseLines() == true)
+        {
+            try {
+                passing_person_id = current_person.getSpouseID();
+                getEarliestPersonEvent();
+                LatLng selected_event_loc = new LatLng(selected_event.getLatitude(),selected_event.getLongitude());
+                LatLng spouse_event_loc = new LatLng(current_earliest_event.getLatitude(),current_earliest_event.getLongitude());
+                Polyline line = map.addPolyline(new PolylineOptions()
+                        .add(selected_event_loc, spouse_event_loc)
+                        .width(5)
+                        .color(Color.RED));
+                polyline_list.add(line);
+            }
+            catch(Exception e)
+            {
+                e.getMessage();
+            }
+        }
+
         return false;
 
+    }
+
+    private void getEarliestPersonEvent()
+    {
+        getPerson();
+        int earliest_year = 3000;
+        int counter = 0;
+        for (int i = 0; i < event_list.size(); i++)
+        {
+            if (event_list.get(i).getPersonID().equals(current_person.getPersonID()))
+            {
+                if (earliest_year > event_list.get(i).getYear())
+                {
+                    earliest_year = event_list.get(i).getYear();
+                    current_earliest_event = event_list.get(i);
+                }
+            }
+        }
     }
 
 
@@ -315,6 +368,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         super.onResume();
         if (map != null) { //prevent crashing if the map doesn't exist yet (eg. on starting activity)
             map.clear();
+            event_list.clear();
+            getEvents();
             SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
         }
