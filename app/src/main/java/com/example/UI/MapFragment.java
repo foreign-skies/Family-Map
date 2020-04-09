@@ -172,7 +172,9 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             JSONObject output = null;
             Client client = new Client("http://192.168.1.142:8080");
             client.setAuth(auth_token);
+
             output = client.makePersonRequest("/event");
+
             return output;
         }
 
@@ -196,7 +198,31 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                     add_event.setCity(array.getJSONObject(i).getString("city"));
                     add_event.setEventType(array.getJSONObject(i).getString("eventType"));
                     add_event.setYear(array.getJSONObject(i).getInt("year"));
-                    event_list.add(add_event);
+
+                    //begin filters
+                    boolean dont_add = false;
+                    if (SettingsBase.getFemaleEvents() == true)
+                    {
+                        passing_person_id = add_event.getPersonID();
+                        getPerson();
+                        if (current_person.getGender().equals("m"))
+                        {
+                            dont_add = true;
+                        }
+                    }
+
+                    if (SettingsBase.getMaleEvents() == true)
+                    {
+                        passing_person_id = add_event.getPersonID();
+                        getPerson();
+                        if (current_person.getGender().equals("f"))
+                        {
+                            dont_add = true;
+                        }
+                    }
+
+                    if (dont_add == false)
+                        event_list.add(add_event);
                 }
             }
             catch(Exception  e)
@@ -228,8 +254,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 startActivity(i);
             }
         });
-
+        Person local_person = new Person();
+        local_person.setSpouseID(current_person.getSpouseID());
+        local_person.setMotherID(current_person.getMotherID());
+        local_person.setFatherID(current_person.getFatherID());
+        local_person.setGender(current_person.getGender());
+        local_person.setLastName(current_person.getLastName());
+        local_person.setFirstName(current_person.getFirstName());
+        local_person.setPersonID(current_person.getPersonID());
+        local_person.setAssociatedUsername(current_person.getAssociatedUsername());
         getEvents();
+        current_person = local_person;
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
         setHasOptionsMenu(true);
@@ -472,7 +507,17 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         if (map != null) { //prevent crashing if the map doesn't exist yet (eg. on starting activity)
             map.clear();
             event_list.clear();
+            Person local_person = new Person();
+            local_person.setSpouseID(current_person.getSpouseID());
+            local_person.setMotherID(current_person.getMotherID());
+            local_person.setFatherID(current_person.getFatherID());
+            local_person.setGender(current_person.getGender());
+            local_person.setLastName(current_person.getLastName());
+            local_person.setFirstName(current_person.getFirstName());
+            local_person.setPersonID(current_person.getPersonID());
+            local_person.setAssociatedUsername(current_person.getAssociatedUsername());
             getEvents();
+            current_person = local_person;
             SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
             mapFragment.getMapAsync(this);
         }
