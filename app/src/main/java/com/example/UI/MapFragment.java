@@ -321,17 +321,55 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         //draw lines
+        Person local_person = new Person();
+        local_person.setSpouseID(current_person.getSpouseID());
+        local_person.setMotherID(current_person.getMotherID());
+        local_person.setFatherID(current_person.getFatherID());
+        local_person.setGender(current_person.getGender());
+        local_person.setLastName(current_person.getLastName());
+        local_person.setFirstName(current_person.getFirstName());
+        local_person.setPersonID(current_person.getPersonID());
+        local_person.setAssociatedUsername(current_person.getAssociatedUsername());
         if (SettingsBase.getSpouseLines() == true)
         {
             SpouseLines(selected_event);
         }
+        current_person = local_person;
         if (SettingsBase.getFamilyTreeLines() == true)
         {
             FamilyTreeLines(selected_event,10);
         }
+        current_person = local_person;
+        if (SettingsBase.getLifeStoryLines() == true)
+        {
+            LifeStoryLines(selected_event);
+        }
 
         return false;
 
+    }
+
+    private void LifeStoryLines(Event selected_event)
+    {
+        boolean got_events = false;
+        boolean once = false;
+        while (got_events == false)
+        {
+            getEarliestPersonEvent(true);
+            LatLng selected_event_loc = new LatLng(selected_event.getLatitude(), selected_event.getLongitude());
+            LatLng earliest_event_loc = new LatLng(current_earliest_event.getLatitude(), current_earliest_event.getLongitude());
+            Polyline line = map.addPolyline(new PolylineOptions()
+                    .add(selected_event_loc, earliest_event_loc)
+                    .width(10)
+                    .color(Color.GREEN));
+            polyline_list.add(line);
+            selected_event = current_earliest_event;
+            if (once == true) {
+                if (selected_event_loc.latitude == earliest_event_loc.latitude && selected_event_loc.longitude == earliest_event_loc.longitude)
+                    got_events = true;
+            }
+            once = true;
+        }
     }
 
     private void FamilyTreeLines(Event selected_event, int line_size)
@@ -348,13 +386,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             if (current_person.getFatherID() != null) {
                 try {
                     passing_person_id = current_person.getFatherID();
-                    getEarliestPersonEvent();
+                    getEarliestPersonEvent(false);
                     LatLng selected_event_loc = new LatLng(selected_event.getLatitude(), selected_event.getLongitude());
                     LatLng spouse_event_loc = new LatLng(current_earliest_event.getLatitude(), current_earliest_event.getLongitude());
                     Polyline line = map.addPolyline(new PolylineOptions()
                             .add(selected_event_loc, spouse_event_loc)
                             .width(line_size)
-                            .color(Color.RED));
+                            .color(Color.BLUE));
                     polyline_list.add(line);
                     getPerson();
                     FamilyTreeLines(current_earliest_event, line_size - 4);
@@ -369,13 +407,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         {
             try {
                 passing_person_id = current_person.getMotherID();
-                getEarliestPersonEvent();
+                getEarliestPersonEvent(false);
                 LatLng selected_event_loc = new LatLng(selected_event.getLatitude(), selected_event.getLongitude());
                 LatLng spouse_event_loc = new LatLng(current_earliest_event.getLatitude(), current_earliest_event.getLongitude());
                 Polyline line = map.addPolyline(new PolylineOptions()
                         .add(selected_event_loc, spouse_event_loc)
                         .width(line_size)
-                        .color(Color.RED));
+                        .color(Color.BLUE));
                 polyline_list.add(line);
                 getPerson();
                 FamilyTreeLines(current_earliest_event, line_size - 4);
@@ -393,12 +431,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     {
         try {
             passing_person_id = current_person.getSpouseID();
-            getEarliestPersonEvent();
+            getEarliestPersonEvent(false);
             LatLng selected_event_loc = new LatLng(selected_event.getLatitude(),selected_event.getLongitude());
             LatLng spouse_event_loc = new LatLng(current_earliest_event.getLatitude(),current_earliest_event.getLongitude());
             Polyline line = map.addPolyline(new PolylineOptions()
                     .add(selected_event_loc, spouse_event_loc)
-                    .width(5)
+                    .width(10)
                     .color(Color.RED));
             polyline_list.add(line);
         }
@@ -408,11 +446,10 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
     }
 
-    private void getEarliestPersonEvent()
+    private void getEarliestPersonEvent(boolean remove)
     {
         getPerson();
         int earliest_year = 3000;
-        int counter = 0;
         for (int i = 0; i < event_list.size(); i++)
         {
             if (event_list.get(i).getPersonID().equals(current_person.getPersonID()))
@@ -421,6 +458,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 {
                     earliest_year = event_list.get(i).getYear();
                     current_earliest_event = event_list.get(i);
+                    if (remove == true)
+                        event_list.remove(i);
                 }
             }
         }
